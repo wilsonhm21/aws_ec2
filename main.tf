@@ -23,7 +23,7 @@ resource "aws_instance" "web_app" {
 
 resource "aws_security_group" "web_sg" {
   name        = "web-flask-sg"
-  description = "Permite tráfico HTTP"
+  description = "Allow HTTP traffic"
 
   ingress {
     from_port   = 80
