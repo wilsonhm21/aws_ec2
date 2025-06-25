@@ -8,7 +8,7 @@ resource "aws_instance" "web_app" {
   key_name               = var.key_name
   vpc_security_group_ids = [aws_security_group.web_sg.id]
 
-  user_data = base64encode(templatefile("${path.module}/user_data.sh", {
+  user_data_base64 = base64encode(templatefile("${path.module}/user_data.sh", {
     bucket_name = var.output_bucket_name,
     rds_host    = var.rds_host,
     rds_user    = var.rds_user,
