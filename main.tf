@@ -22,7 +22,7 @@ resource "aws_instance" "web_app" {
 }
 
 resource "aws_security_group" "web_sg" {
-  name        = "web-flask-sg2"
+  name        = "web-flask-sg"
   description = "Allow HTTP traffic"
 
   ingress {
