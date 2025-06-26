@@ -4,7 +4,7 @@ sudo apt install -y python3-pip git
 
 # Clonar el repo
 cd /home/ubuntu
-git clone https://github.com/TU_USUARIO/aws_ec2.git app
+git clone https://github.com/wilsonhm21/aws_ec2.git app
 cd app
 
 # Instalar dependencias
