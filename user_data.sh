@@ -10,15 +10,15 @@ cd app
 # Instalar dependencias
 pip3 install -r requirements.txt
 
-# Configurar variables de entorno para que *todos* los procesos las hereden
-echo "OUTPUT_BUCKET=${bucket_name}" | sudo tee -a /etc/environment
-echo "RDS_HOST=${rds_host}" | sudo tee -a /etc/environment
-echo "RDS_USER=${rds_user}" | sudo tee -a /etc/environment
-echo "RDS_PASS=${rds_pass}" | sudo tee -a /etc/environment
-echo "RDS_DB=${rds_db}" | sudo tee -a /etc/environment
-
-# Recargar variables
-source /etc/environment
+# --- CAMBIO SUGERIDO AQUÍ ---
+# Configurar variables de entorno directamente en el shell actual,
+# para que el proceso de Flask las herede.
+export OUTPUT_BUCKET="${bucket_name}"
+export RDS_HOST="${rds_host}"
+export RDS_USER="${rds_user}"
+export RDS_PASS="${rds_pass}"
+export RDS_DB="${rds_db}"
+# --- FIN DEL CAMBIO SUGERIDO ---
 
 # Ejecutar Flask
 export FLASK_APP=app
