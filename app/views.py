@@ -6,7 +6,10 @@ import os
 import json
 
 s3 = boto3.client('s3')
+
 bucket_name = os.getenv('OUTPUT_BUCKET')
+if not bucket_name:
+    raise ValueError("⚠️ La variable de entorno OUTPUT_BUCKET no está definida en la instancia EC2")
 
 rds_host = os.getenv('RDS_HOST')
 rds_user = os.getenv('RDS_USER')

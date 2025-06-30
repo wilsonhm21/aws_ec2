@@ -10,13 +10,15 @@ cd app
 # Instalar dependencias
 pip3 install -r requirements.txt
 
-# Exportar variables de entorno
-echo "export OUTPUT_BUCKET='${bucket_name}'" >> ~/.bashrc
-echo "export RDS_HOST='${rds_host}'" >> ~/.bashrc
-echo "export RDS_USER='${rds_user}'" >> ~/.bashrc
-echo "export RDS_PASS='${rds_pass}'" >> ~/.bashrc
-echo "export RDS_DB='${rds_db}'" >> ~/.bashrc
-source ~/.bashrc
+# Configurar variables de entorno para que *todos* los procesos las hereden
+echo "OUTPUT_BUCKET=${bucket_name}" | sudo tee -a /etc/environment
+echo "RDS_HOST=${rds_host}" | sudo tee -a /etc/environment
+echo "RDS_USER=${rds_user}" | sudo tee -a /etc/environment
+echo "RDS_PASS=${rds_pass}" | sudo tee -a /etc/environment
+echo "RDS_DB=${rds_db}" | sudo tee -a /etc/environment
+
+# Recargar variables
+source /etc/environment
 
 # Ejecutar Flask
 export FLASK_APP=app
