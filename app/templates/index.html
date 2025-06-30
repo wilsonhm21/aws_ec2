@@ -1,16 +1,20 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Reportes</title>
+  <title>JSON Validados</title>
 </head>
 <body>
-  <h1>Reportes JSON en S3</h1>
+  <h1>Archivos JSON disponibles</h1>
   <ul>
-    {% for file in files %}
-      <li>{{ file }}</li>
+    {% for f in files %}
+      <li>
+        {{f}}
+        <form action="/guardar" method="post" style="display:inline">
+          <input type="hidden" name="file" value="{{f}}">
+          <button type="submit">Guardar en BD</button>
+        </form>
+      </li>
     {% endfor %}
   </ul>
-
-  <h2>Total registros en RDS: {{ total }}</h2>
 </body>
 </html>
