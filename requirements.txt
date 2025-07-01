@@ -1,4 +1,21 @@
-flask
+# Paquetes base
+Flask
 boto3
 pymysql
-flask_sqlalchemy
+Flask-SQLAlchemy
+
+# Dependencias para el dashboard moderno
+python-dotenv
+pandas
+plotly
+
+# Extensiones Flask
+Flask-Bootstrap5
+Flask-WTF
+Flask-Login
+
+# Para tablas interactivas
+bootstrap-table
+
+# Para gráficos
+chart.js

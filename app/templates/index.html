@@ -1,20 +1,281 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-  <title>JSON Validados</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Validador de Repuestos</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-table@1.21.4/dist/bootstrap-table.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #4e73df;
+      --secondary-color: #1cc88a;
+      --danger-color: #e74a3b;
+      --warning-color: #f6c23e;
+    }
+    body {
+      background-color: #f8f9fc;
+      font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .sidebar {
+      background: linear-gradient(180deg, var(--primary-color) 0%, #224abe 100%);
+      min-height: 100vh;
+      color: white;
+    }
+    .sidebar .nav-link {
+      color: rgba(255, 255, 255, 0.8);
+    }
+    .sidebar .nav-link:hover, .sidebar .nav-link.active {
+      color: white;
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+    .card {
+      border: none;
+      border-radius: 0.35rem;
+      box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+      transition: all 0.3s;
+    }
+    .card:hover {
+      box-shadow: 0 0.5rem 1rem rgba(58, 59, 69, 0.15);
+    }
+    .stat-card {
+      border-left: 0.25rem solid;
+    }
+    .stat-card.primary {
+      border-left-color: var(--primary-color);
+    }
+    .stat-card.success {
+      border-left-color: var(--secondary-color);
+    }
+    .stat-card.danger {
+      border-left-color: var(--danger-color);
+    }
+    .stat-card.warning {
+      border-left-color: var(--warning-color);
+    }
+    .file-card {
+      border-left: 3px solid var(--primary-color);
+      transition: transform 0.3s;
+    }
+    .file-card:hover {
+      transform: translateY(-5px);
+    }
+    .badge-success {
+      background-color: var(--secondary-color);
+    }
+  </style>
 </head>
 <body>
-  <h1>Archivos JSON disponibles</h1>
-  <ul>
-    {% for f in files %}
-      <li>
-        {{f}}
-        <form action="/guardar" method="post" style="display:inline">
-          <input type="hidden" name="file" value="{{f}}">
-          <button type="submit">Guardar en BD</button>
-        </form>
-      </li>
-    {% endfor %}
-  </ul>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar -->
+      <div class="col-md-3 col-lg-2 d-md-block sidebar collapse p-0">
+        <div class="position-sticky pt-3">
+          <div class="text-center py-4">
+            <h4>
+              <i class="bi bi-gear-fill me-2"></i>Validador Repuestos
+            </h4>
+          </div>
+          <ul class="nav flex-column">
+            <li class="nav-item">
+              <a class="nav-link active" href="{{ url_for('dashboard') }}">
+                <i class="bi bi-house-door me-2"></i>Inicio
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('estadisticas') }}">
+                <i class="bi bi-graph-up me-2"></i>Estadísticas
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">
+                <i class="bi bi-cloud-arrow-up me-2"></i>Cargar Archivos
+              </a>
+            </li>
+          </ul>
+          <div class="position-absolute bottom-0 start-0 end-0 p-3">
+            <div class="text-center small">
+              <p class="mb-0">Sistema de Validación v2.0</p>
+              <p class="text-muted">Última actualización: {{ current_time }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+        <!-- Alertas Flash -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+          <h1 class="h2">
+            <i class="bi bi-file-earmark-arrow-up me-2"></i>Archivos Validados
+          </h1>
+          <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group me-2">
+              <button type="button" class="btn btn-sm btn-outline-secondary" onclick="location.reload()">
+                <i class="bi bi-arrow-clockwise"></i> Actualizar
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="row mb-4">
+          <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card stat-card primary h-100">
+              <div class="card-body">
+                <div class="row align-items-center">
+                  <div class="col mr-2">
+                    <div class="text-xs fw-bold text-primary text-uppercase mb-1">
+                      Archivos Procesados
+                    </div>
+                    <div class="h5 mb-0 fw-bold text-gray-800">{{ stats.total_files }}</div>
+                  </div>
+                  <div class="col-auto">
+                    <i class="bi bi-folder2 text-primary fs-1"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card stat-card success h-100">
+              <div class="card-body">
+                <div class="row align-items-center">
+                  <div class="col mr-2">
+                    <div class="text-xs fw-bold text-success text-uppercase mb-1">
+                      Registros Válidos
+                    </div>
+                    <div class="h5 mb-0 fw-bold text-gray-800">{{ stats.valid_records }}</div>
+                  </div>
+                  <div class="col-auto">
+                    <i class="bi bi-check-circle text-success fs-1"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card stat-card danger h-100">
+              <div class="card-body">
+                <div class="row align-items-center">
+                  <div class="col mr-2">
+                    <div class="text-xs fw-bold text-danger text-uppercase mb-1">
+                      Registros Inválidos
+                    </div>
+                    <div class="h5 mb-0 fw-bold text-gray-800">{{ stats.invalid_records }}</div>
+                  </div>
+                  <div class="col-auto">
+                    <i class="bi bi-exclamation-triangle text-danger fs-1"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card stat-card warning h-100">
+              <div class="card-body">
+                <div class="row align-items-center">
+                  <div class="col mr-2">
+                    <div class="text-xs fw-bold text-warning text-uppercase mb-1">
+                      Almacenamiento
+                    </div>
+                    <div class="h5 mb-0 fw-bold text-gray-800">{{ "%.2f"|format(stats.storage_used) }} MB</div>
+                  </div>
+                  <div class="col-auto">
+                    <i class="bi bi-hdd text-warning fs-1"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Files Table -->
+        <div class="card shadow mb-4">
+          <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 fw-bold text-primary">
+              <i class="bi bi-list-ul me-2"></i>Listado de Archivos
+            </h6>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-hover" id="filesTable">
+                <thead>
+                  <tr>
+                    <th>Archivo</th>
+                    <th>Fecha</th>
+                    <th>Tamaño</th>
+                    <th>Registros</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for file in files %}
+                  <tr>
+                    <td>
+                      <i class="bi bi-file-earmark-code text-primary me-2"></i>
+                      {{ file.filename }}
+                    </td>
+                    <td>{{ file.date_processed }}</td>
+                    <td>{{ file.size }}</td>
+                    <td>
+                      <span class="badge bg-primary rounded-pill">{{ file.records }}</span>
+                    </td>
+                    <td>
+                      <div class="btn-group">
+                        <form action="{{ url_for('guardar') }}" method="post" class="me-2">
+                          <input type="hidden" name="file" value="{{ file.filename }}">
+                          <button type="submit" class="btn btn-sm btn-success">
+                            <i class="bi bi-save me-1"></i>Guardar
+                          </button>
+                        </form>
+                        <a href="{{ url_for('preview', filename=file.filename) }}" class="btn btn-sm btn-primary">
+                          <i class="bi bi-eye me-1"></i>Vista Previa
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card-footer small text-muted">
+            Actualizado el {{ current_time }}
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.21.4/dist/bootstrap-table.min.js"></script>
+  <script>
+    // Inicializar tabla con búsqueda y paginación
+    $(document).ready(function() {
+      $('#filesTable').bootstrapTable({
+        search: true,
+        pagination: true,
+        pageSize: 10
+      });
+      
+      // Actualizar cada 60 segundos
+      setInterval(function() {
+        window.location.reload();
+      }, 60000);
+    });
+  </script>
 </body>
 </html>
