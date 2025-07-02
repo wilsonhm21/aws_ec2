@@ -2,6 +2,7 @@
 sudo apt update -y
 sudo apt install -y python3-pip git
 
+
 # Clonar el repo
 cd /home/ubuntu
 git clone https://github.com/wilsonhm21/aws_ec2.git app
@@ -22,4 +23,4 @@ export RDS_DB="${rds_db}"
 
 # Ejecutar Flask
 export FLASK_APP=app
-nohup flask run --host=0.0.0.0 --port=80 &
+nohup flask run --host=0.0.0.0 --port=5000 &
