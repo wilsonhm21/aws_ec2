@@ -20,7 +20,7 @@ export RDS_USER="${rds_user}"
 export RDS_PASS="${rds_pass}"
 export RDS_DB="${rds_db}"
 # --- FIN DEL CAMBIO SUGERIDO ---
-
+export FLASK_SECRET_KEY="clave-super-segura-4567" 
 # Ejecutar Flask
 export FLASK_APP=app
 nohup python3 -m flask run --host=0.0.0.0 --port=5000 > flask.log 2>&1 &

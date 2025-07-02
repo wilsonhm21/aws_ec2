@@ -49,14 +49,14 @@ def dashboard():
             'storage_used': sum(f['Size'] for f in files if f['Key'].endswith('.json'))/1024/1024
         }
         
-        return render_template("dashboard.html", 
+        return render_template("index.html", 
                             files=json_files, 
                             stats=stats,
                             current_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     
     except Exception as e:
         flash(f'Error al cargar los archivos: {str(e)}', 'danger')
-        return render_template("dashboard.html", 
+        return render_template("index.html", 
                             files=[], 
                             stats={},
                             current_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
