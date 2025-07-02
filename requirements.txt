@@ -13,9 +13,3 @@ plotly
 Flask-Bootstrap5
 Flask-WTF
 Flask-Login
-
-# Para tablas interactivas
-bootstrap-table
-
-# Para gráficos
-chart.js

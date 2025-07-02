@@ -23,4 +23,4 @@ export RDS_DB="${rds_db}"
 
 # Ejecutar Flask
 export FLASK_APP=app
-nohup flask run --host=0.0.0.0 --port=5000 &
+nohup python3 -m flask run --host=0.0.0.0 --port=5000 > flask.log 2>&1 &
